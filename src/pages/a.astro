@@ -182,7 +182,7 @@ const FONTS =
         </div>
         <p class="lede">{s.tariffsIntro.subtitle}</p>
       </div>
-      <div class="tf-grid">
+      <div class={'tf-grid tf-' + s.tariffs.length}>
         {s.tariffs.map((t) => (
           <div class={'tf' + (t.badge ? ' featured' : '')} data-animate>
             {t.badge && <div class="tf-badge mono">{t.badge}</div>}
@@ -379,7 +379,10 @@ const FONTS =
   .fmt-row b { font-weight: 500; font-size: 17px; }
 
   /* ТАРИФЫ */
+  /* Число колонок = число тарифов: их состав ещё меняется */
   .tf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .tf-grid.tf-2 { grid-template-columns: repeat(2, 1fr); max-width: 860px; margin: 0 auto; }
+  .tf-grid.tf-1 { grid-template-columns: minmax(0, 420px); justify-content: center; }
   .tf { padding: 32px 26px 34px; border-left: 1px solid var(--line); display: flex; flex-direction: column; }
   .tf:first-child { border-left: 0; padding-left: 0; }
   .tf.featured { background: var(--paper-2); }
@@ -420,6 +423,7 @@ const FONTS =
   @media (max-width: 620px) {
     .wrap { padding: 0 20px; }
     section { padding: 64px 0; }
-    .ex-grid, .tf-grid { grid-template-columns: 1fr; }
+    .ex-grid, .tf-grid,
+    .tf-grid.tf-2, .tf-grid.tf-1 { grid-template-columns: 1fr; max-width: none; }
   }
 </style>

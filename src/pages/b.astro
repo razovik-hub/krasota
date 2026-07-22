@@ -178,7 +178,7 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
         <h2>{s.tariffsIntro.title}</h2>
         <p>{s.tariffsIntro.subtitle}</p>
       </div>
-      <div class="tf-grid">
+      <div class={'tf-grid tf-' + s.tariffs.length}>
         {s.tariffs.map((t) => (
           <div class={'tf' + (t.badge ? ' featured' : '')} data-animate>
             {t.badge && <div class="tf-badge kicker">{t.badge}</div>}
@@ -343,7 +343,10 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
   .fmt-row b { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 22px; }
 
   /* ТАРИФЫ */
+  /* Число колонок = число тарифов: их состав ещё меняется */
   .tf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .tf-grid.tf-2 { grid-template-columns: repeat(2, 1fr); max-width: 880px; margin: 0 auto; }
+  .tf-grid.tf-1 { grid-template-columns: minmax(0, 440px); justify-content: center; }
   .tf { border: 1px solid var(--line); padding: 34px 30px 36px; display: flex; flex-direction: column; background: var(--paper); }
   .tf.featured { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .tf.featured .tf-feats li { color: rgba(246, 243, 239, 0.72); border-color: rgba(246, 243, 239, 0.18); }
@@ -376,7 +379,8 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
     .p-row { grid-template-columns: 1fr; gap: 12px; }
     .p-row .n { font-size: 52px; }
     .ex-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-    .tf-grid { grid-template-columns: 1fr; }
+    .tf-grid,
+    .tf-grid.tf-2, .tf-grid.tf-1 { grid-template-columns: 1fr; max-width: none; }
     .nav { display: none; }
   }
   @media (max-width: 620px) {
