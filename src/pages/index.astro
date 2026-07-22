@@ -1,12 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
-import { asset } from '../lib/asset';
 import { loadSite } from '../lib/content';
 
 const s = await loadSite();
 const FONTS = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap';
 
-// Служебная страница выбора. Удаляется вместе с двумя лишними вариантами.
+// Служебная страница выбора: ведёт на три САМОСТОЯТЕЛЬНЫХ сайта, каждый со своим адресом.
+// Удаляется вместе с двумя невыбранными вариантами.
+const site = (id: string) => `https://razovik-hub.github.io/krasota-${id}/`;
 const variants = [
   {
     id: 'a',
@@ -42,14 +43,15 @@ const variants = [
         <div class="mark">Черновик на согласовании</div>
         <h1>Три варианта оформления</h1>
         <p class="lede">
-          Один и тот же курс, одинаковые тексты — отличается только визуальный язык.
-          Посмотрите все три и скажите, какой ваш. Выбранный доводим до конца, два других удаляем.
+          Три отдельных сайта, каждый по своему адресу. Курс и тексты у них одинаковые —
+          отличается только визуальный язык. Посмотрите все три и скажите, какой ваш:
+          выбранный доводим до конца, два других удаляем.
         </p>
       </div>
 
       <div class="grid">
         {variants.map((v) => (
-          <a class="card" href={asset(`/${v.id}/`)}>
+          <a class="card" href={site(v.id)}>
             <div class="card-top">
               <span class="letter">{v.label}</span>
               <div class="swatches">

@@ -1,0 +1,427 @@
+---
+import Base from '../layouts/Base.astro';
+import { asset, isTodo } from '../lib/asset';
+import { loadSite } from '../lib/content';
+
+const s = await loadSite();
+const h = s.hero;
+const FONTS =
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap';
+---
+
+<Base title={h.siteTitle!} description={h.subtitle} fonts={FONTS}>
+
+  <header class="hdr" data-header>
+    <div class="wrap hdr-in">
+      <div class="logo">Алхимия <span>красоты</span></div>
+      <nav class="nav">
+        <a href="#program">Программа</a>
+        <a href="#experts">Эксперты</a>
+        <a href="#format">Формат</a>
+        <a href="#tariffs">Стоимость</a>
+      </nav>
+      <a class="btn" href="#cta">Забронировать</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="mono">{h.eyebrow}</div>
+        <h1>
+          {h.titleMain}<br /><em>{h.titleAccent}</em><br />{h.titleTail}
+        </h1>
+        <p class="sub">{h.subtitle}</p>
+        <div class="hero-cta">
+          <a class="btn btn-lg" href="#cta">{h.ctaPrimary}</a>
+          <a class="btn btn-o btn-lg" href="#program">{h.ctaSecondary}</a>
+        </div>
+      </div>
+      <div class="hero-photo">
+        {!isTodo(h.photo) && <img src={asset(h.photo!)} alt={h.photoAlt ?? ''} />}
+        <div class="photo-tag">
+          <b>Марина Баяндина</b><span class="mono">Ведущий эксперт</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЦИФРЫ -->
+  <div class="spec">
+    <div class="wrap spec-grid">
+      {h.stats?.map((st) => (
+        <div class="spec-cell">
+          <div class="spec-v">{st.value}</div>
+          <div class="mono">{st.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- БОЛЬ -->
+  <section id="problem">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.problem.data.eyebrow}</div>
+          <h2>{s.problem.data.title}</h2>
+        </div>
+        <p class="lede">{s.problem.data.subtitle}</p>
+      </div>
+      <div class="md-list" data-animate><s.problem.Body /></div>
+    </div>
+  </section>
+
+  <!-- ПРОГРАММА -->
+  <section id="program">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.blocksIntro.eyebrow}</div>
+          <h2>{s.blocksIntro.title}</h2>
+        </div>
+        <p class="lede">{s.blocksIntro.subtitle}</p>
+      </div>
+      <div class="rows">
+        {s.blocks.map((b) => (
+          <div class="row" data-animate>
+            <div class="idx">{String(b.data.order).padStart(2, '0')}</div>
+            <div>
+              <h3>{b.data.title}</h3>
+              {b.data.tag && <span class="tag">{b.data.tag}</span>}
+            </div>
+            <div class="row-body">
+              <b.Body />
+              {b.data.outcome && (
+                <div class="outcome"><span class="mono">На выходе</span>{b.data.outcome}</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ЭКСПЕРТЫ -->
+  <section id="experts">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.expertsIntro.eyebrow}</div>
+          <h2>{s.expertsIntro.title}</h2>
+        </div>
+        <p class="lede">{s.expertsIntro.subtitle}</p>
+      </div>
+      <div class="ex-grid">
+        {s.experts.map((e) => (
+          <div class={'ex' + (e.data.lead ? ' lead-ex' : '')} data-animate>
+            <div class="ph">
+              {isTodo(e.data.photo)
+                ? <div class="ph-empty">Фото</div>
+                : <img src={asset(e.data.photo!)} alt={e.data.name} />}
+            </div>
+            {e.data.badge && <span class="ex-badge mono">{e.data.badge}</span>}
+            <h3>{e.data.name}</h3>
+            {e.data.role && <div class="role">{e.data.role}</div>}
+            {e.data.blocks && <div class="ex-blocks mono">{e.data.blocks}</div>}
+            {e.data.lead && <div class="ex-bio"><e.Body /></div>}
+            {e.data.credentials && (
+              <div class="creds">{e.data.credentials.map((c) => <span>{c}</span>)}</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ДЛЯ КОГО -->
+  <section id="audience">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.audience.data.eyebrow}</div>
+          <h2>{s.audience.data.title}</h2>
+        </div>
+        <p class="lede">{s.audience.data.subtitle}</p>
+      </div>
+      <div class="md-list" data-animate><s.audience.Body /></div>
+    </div>
+  </section>
+
+  <!-- ФОРМАТ -->
+  <section id="format">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.format.eyebrow}</div>
+          <h2>{s.format.title}</h2>
+        </div>
+        <p class="lede">{s.format.subtitle}</p>
+      </div>
+      <div class="fmt" data-animate>
+        {s.format.items?.map((it) => (
+          <div class="fmt-row">
+            <span class="mono">{it.label}</span>
+            <b class={isTodo(it.value) ? 'todo' : ''}>{it.value}</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ТАРИФЫ -->
+  <section id="tariffs">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.tariffsIntro.eyebrow}</div>
+          <h2>{s.tariffsIntro.title}</h2>
+        </div>
+        <p class="lede">{s.tariffsIntro.subtitle}</p>
+      </div>
+      <div class={'tf-grid tf-' + s.tariffs.length}>
+        {s.tariffs.map((t) => (
+          <div class={'tf' + (t.badge ? ' featured' : '')} data-animate>
+            {t.badge && <div class="tf-badge mono">{t.badge}</div>}
+            <div class="tf-name">{t.name}</div>
+            {t.limit && <div class={'tf-limit mono' + (isTodo(t.limit) ? ' todo' : '')}>{t.limit}</div>}
+            <div class={'tf-price' + (isTodo(t.price) ? ' todo' : '')}>{t.price}</div>
+            <ul class="tf-feats">{t.features.map((f) => <li>{f}</li>)}</ul>
+            <a class={'btn ' + (t.badge ? '' : 'btn-o')} href="#cta">{t.cta}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="wrap" data-animate>
+      <div class="mono">Набор открыт</div>
+      <h2>{s.cta.title}</h2>
+      <p>{s.cta.subtitle}</p>
+      <a class="btn btn-lg" href="#cta">{s.cta.button}</a>
+      {s.cta.note && <div class="note mono">{s.cta.note}</div>}
+    </div>
+  </section>
+
+  <footer class="ftr">
+    <div class="wrap mono">Алхимия красоты · Марина Баяндина · черновик на согласовании</div>
+  </footer>
+</Base>
+
+<style is:global>
+  :root {
+    --paper: #fbfaf7;
+    --paper-2: #ffffff;
+    --ink: #15161a;
+    --ink-soft: #6b6c72;
+    --clay: #a8442f;
+    --sand: #e9e4da;
+    --line: rgba(21, 22, 26, 0.13);
+    --line-2: rgba(21, 22, 26, 0.07);
+    --maxw: 1240px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+  h1, h2, h3 { font-weight: 500; letter-spacing: -0.035em; line-height: 1.02; }
+
+  .mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .todo { color: var(--clay) !important; }
+
+  [data-animate] { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  [data-animate].in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate] { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* HEADER */
+  .hdr {
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251, 250, 247, 0.92);
+    backdrop-filter: blur(12px);
+  }
+  .hdr-in { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 20px; }
+  .logo { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+  .logo span { color: var(--clay); }
+  .nav { display: flex; gap: 30px; }
+  .nav a { color: var(--ink-soft); text-decoration: none; font-size: 13.5px; }
+  .nav a:hover { color: var(--ink); }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13.5px; font-weight: 500; padding: 11px 22px;
+    border: 1px solid var(--ink); background: var(--ink); color: #fff;
+    text-decoration: none; cursor: pointer; transition: 0.2s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--clay); border-color: var(--clay); }
+  .btn-o { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-o:hover { background: transparent; color: var(--clay); border-color: var(--clay); }
+  .btn-lg { padding: 15px 30px; font-size: 14.5px; }
+
+  /* HERO */
+  .hero { padding: 78px 0 0; border-bottom: 1px solid var(--line); }
+  .hero-grid { display: grid; grid-template-columns: 1fr 420px; gap: 64px; align-items: end; }
+  .hero h1 { font-size: clamp(44px, 6.2vw, 84px); margin: 26px 0 0; }
+  .hero h1 em { font-style: normal; color: var(--clay); }
+  .hero .sub { font-size: 18px; color: var(--ink-soft); max-width: 50ch; margin: 26px 0 34px; line-height: 1.62; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 52px; }
+  .hero-photo { position: relative; margin-bottom: -1px; }
+  .hero-photo img { width: 100%; height: 472px; object-fit: cover; object-position: 52% 22%; filter: grayscale(0.28) contrast(1.04); }
+  .photo-tag {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: var(--paper); border-top: 1px solid var(--line);
+    padding: 13px 16px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  }
+  .photo-tag b { font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }
+
+  /* ЦИФРЫ */
+  .spec { border-bottom: 1px solid var(--line); }
+  .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .spec-cell { padding: 26px 0 26px 26px; border-left: 1px solid var(--line); }
+  .spec-cell:first-child { border-left: 0; padding-left: 0; }
+  .spec-v { font-size: 34px; font-weight: 400; letter-spacing: -0.04em; margin-bottom: 4px; }
+
+  /* SECTIONS */
+  section { padding: 92px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 64px; }
+  .sec-head { display: grid; grid-template-columns: 1fr 2fr; gap: 64px; margin-bottom: 56px; align-items: start; }
+  .sec-head h2 { font-size: clamp(30px, 3.6vw, 44px); margin-top: 18px; }
+  .sec-head .lede { color: var(--ink-soft); font-size: 17px; max-width: 56ch; }
+
+  /* СПИСКИ ИЗ MARKDOWN */
+  .md-list ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+  .md-list li {
+    padding: 20px 0 20px 34px; border-bottom: 1px solid var(--line-2);
+    position: relative; color: var(--ink-soft); font-size: 16.5px;
+  }
+  .md-list li::before {
+    content: ''; position: absolute; left: 0; top: 30px;
+    width: 18px; height: 1px; background: var(--clay);
+  }
+  .md-list strong { color: var(--ink); font-weight: 500; }
+
+  /* ПРОГРАММА */
+  .rows { border-top: 1px solid var(--line); }
+  .row {
+    display: grid; grid-template-columns: 64px 1fr 1.25fr; gap: 32px;
+    padding: 28px 0; border-bottom: 1px solid var(--line-2); align-items: start; transition: background 0.2s;
+  }
+  .row:hover { background: var(--paper-2); }
+  .row .idx { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--clay); padding-top: 5px; }
+  .row h3 { font-size: 23px; letter-spacing: -0.03em; }
+  .row .tag {
+    display: block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px;
+  }
+  .row-body { color: var(--ink-soft); font-size: 15.5px; }
+  .row-body p + p { margin-top: 12px; }
+  .outcome {
+    margin-top: 16px; padding: 14px 16px; background: var(--paper-2);
+    border: 1px solid var(--line-2); border-left: 2px solid var(--clay);
+    color: var(--ink); font-size: 15px;
+  }
+  .outcome .mono { display: block; margin-bottom: 5px; color: var(--clay); }
+
+  /* ЭКСПЕРТЫ */
+  .ex-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; border-top: 1px solid var(--line); }
+  .ex { padding: 28px 26px 30px; border-left: 1px solid var(--line); }
+  .ex:first-child { border-left: 0; padding-left: 0; }
+  .ex.lead-ex { background: var(--paper-2); }
+  .ex .ph { width: 100%; aspect-ratio: 1 / 1.12; background: var(--sand); margin-bottom: 18px; overflow: hidden; }
+  .ex .ph img { width: 100%; height: 100%; object-fit: cover; object-position: 55% 30%; filter: grayscale(0.3) contrast(1.03); }
+  .ph-empty {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em;
+    color: #a9a296; text-transform: uppercase;
+    background: repeating-linear-gradient(45deg, var(--sand), var(--sand) 7px, #e2dcd1 7px, #e2dcd1 14px);
+  }
+  .ex-badge { display: block; margin-bottom: 8px; color: var(--clay); }
+  .ex h3 { font-size: 19px; letter-spacing: -0.03em; margin-bottom: 6px; }
+  .ex .role { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .ex-blocks { margin-top: 10px; font-size: 10px; line-height: 1.5; }
+  .ex-bio { font-size: 13.5px; color: var(--ink-soft); margin-top: 14px; }
+  .ex-bio p + p { margin-top: 10px; }
+  .ex-bio strong { color: var(--ink); font-weight: 500; }
+  .creds { margin-top: 14px; display: flex; flex-direction: column; gap: 5px; }
+  .creds span {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-soft);
+  }
+
+  /* ФОРМАТ */
+  .fmt { border-top: 1px solid var(--line); max-width: 760px; }
+  .fmt-row {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+    padding: 18px 0; border-bottom: 1px solid var(--line-2);
+  }
+  .fmt-row b { font-weight: 500; font-size: 17px; }
+
+  /* ТАРИФЫ */
+  /* Число колонок = число тарифов: их состав ещё меняется */
+  .tf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .tf-grid.tf-2 { grid-template-columns: repeat(2, 1fr); max-width: 860px; margin: 0 auto; }
+  .tf-grid.tf-1 { grid-template-columns: minmax(0, 420px); justify-content: center; }
+  .tf { padding: 32px 26px 34px; border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+  .tf:first-child { border-left: 0; padding-left: 0; }
+  .tf.featured { background: var(--paper-2); }
+  .tf-badge { color: var(--clay); margin-bottom: 10px; }
+  .tf-name { font-size: 21px; font-weight: 500; letter-spacing: -0.03em; }
+  .tf-limit { margin-top: 8px; }
+  .tf-price { font-size: 34px; font-weight: 400; letter-spacing: -0.04em; margin: 16px 0 20px; }
+  .tf-feats { list-style: none; margin-bottom: 26px; flex: 1; }
+  .tf-feats li {
+    font-size: 14.5px; color: var(--ink-soft); padding: 9px 0 9px 20px;
+    border-bottom: 1px solid var(--line-2); position: relative;
+  }
+  .tf-feats li::before { content: ''; position: absolute; left: 0; top: 18px; width: 10px; height: 1px; background: var(--clay); }
+  .tf .btn { width: 100%; }
+
+  /* CTA */
+  .cta { background: var(--ink); color: #fff; border: 0; }
+  .cta h2 { font-size: clamp(32px, 4.4vw, 54px); max-width: 20ch; margin: 20px 0 0; }
+  .cta p { color: rgba(255, 255, 255, 0.62); margin: 20px 0 34px; max-width: 48ch; font-size: 17px; }
+  .cta .mono { color: rgba(255, 255, 255, 0.45); }
+  .cta .btn { background: var(--clay); border-color: var(--clay); }
+  .cta .btn:hover { background: #fff; border-color: #fff; color: var(--ink); }
+  .cta .note { margin-top: 18px; }
+
+  .ftr { padding: 28px 0; }
+
+  @media (max-width: 980px) {
+    .hero-grid, .sec-head { grid-template-columns: 1fr; gap: 34px; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+    .spec-cell { border-left: 0; padding-left: 0; border-top: 1px solid var(--line-2); }
+    .md-list ul { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 40px 1fr; gap: 16px; }
+    .row-body { grid-column: 2; }
+    .ex-grid, .tf-grid { grid-template-columns: 1fr 1fr; }
+    .ex, .tf { border-left: 0; padding: 24px 0; }
+    .nav { display: none; }
+  }
+  @media (max-width: 620px) {
+    .wrap { padding: 0 20px; }
+    section { padding: 64px 0; }
+    .ex-grid, .tf-grid,
+    .tf-grid.tf-2, .tf-grid.tf-1 { grid-template-columns: 1fr; max-width: none; }
+  }
+</style>

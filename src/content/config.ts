@@ -59,6 +59,7 @@ const page = defineCollection({
     note: z.string().optional(),
     photo: z.string().optional(),
     photoAlt: z.string().optional(),
+    siteTitle: z.string().optional(),
     trust: z.array(z.string()).optional(),
     stats: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
     items: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
