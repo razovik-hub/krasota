@@ -1,0 +1,65 @@
+---
+import { asset } from '../lib/asset';
+
+interface Props { current: 'a' | 'b' | 'c' }
+const { current } = Astro.props;
+
+const variants = [
+  { id: 'a', label: 'A · Клиника' },
+  { id: 'b', label: 'B · Глянец' },
+  { id: 'c', label: 'C · Тактильный нюд' },
+] as const;
+---
+<!--
+  Служебная панель на время выбора направления. Намеренно нейтральная — не часть дизайна.
+  Удаляется вместе с двумя лишними вариантами, когда направление выбрано.
+-->
+<div class="vsw">
+  <div class="vsw-in">
+    <span class="vsw-note">Черновик на выбор · содержимое одинаковое, отличается подача</span>
+    <div class="vsw-links">
+      {variants.map((v) => (
+        <a href={asset(`/${v.id}/`)} class={v.id === current ? 'on' : ''}>{v.label}</a>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .vsw {
+    background: #15161a;
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    position: relative;
+    z-index: 200;
+  }
+  .vsw-in {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .vsw-note { color: rgba(255, 255, 255, 0.5); text-transform: uppercase; }
+  .vsw-links { display: flex; gap: 6px; flex-shrink: 0; }
+  .vsw-links a {
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    padding: 5px 11px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    white-space: nowrap;
+  }
+  .vsw-links a:hover { color: #fff; border-color: rgba(255, 255, 255, 0.5); }
+  .vsw-links a.on { background: #fff; color: #15161a; border-color: #fff; }
+  @media (max-width: 720px) {
+    .vsw-note { display: none; }
+    .vsw-in { justify-content: center; height: auto; padding: 8px 16px; }
+    .vsw-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>

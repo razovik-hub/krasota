@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import { asset } from '../lib/asset';
+import { loadSite } from '../lib/content';
+
+const s = await loadSite();
+const FONTS = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap';
+
+// Служебная страница выбора. Удаляется вместе с двумя лишними вариантами.
+const variants = [
+  {
+    id: 'a',
+    label: 'A',
+    name: 'Клиника',
+    idea: 'Доказательная точность',
+    text: 'Гротеск, строгая сетка на тонких линиях, моноширинные подписи, приглушённый акцент цвета глины. Выглядит как приём у врача, а не как реклама крема.',
+    swatches: ['#fbfaf7', '#15161a', '#a8442f', '#e9e4da'],
+  },
+  {
+    id: 'b',
+    label: 'B',
+    name: 'Глянец',
+    idea: 'Разворот бьюти-журнала',
+    text: 'Крупный контрастный сериф, помадный акцент, бегущая строка, асимметрия. Самый «бьюти» из трёх и самый привычный для аудитории.',
+    swatches: ['#f6f3ef', '#111014', '#b01f3c', '#ebd9d6'],
+  },
+  {
+    id: 'c',
+    label: 'C',
+    name: 'Тактильный нюд',
+    idea: 'Ритуал ухода',
+    text: 'Мягкий сериф, тёплая телесная палитра, арочный портрет, крупные скругления и карточки. Греет сильнее остальных, ближе к спа, чем к клинике.',
+    swatches: ['#f3e8df', '#33241d', '#a9694f', '#c98f76'],
+  },
+] as const;
+---
+
+<Base title="Алхимия красоты · три варианта оформления" fonts={FONTS}>
+  <main class="pick">
+    <div class="wrap">
+      <div class="head">
+        <div class="mark">Черновик на согласовании</div>
+        <h1>Три варианта оформления</h1>
+        <p class="lede">
+          Один и тот же курс, одинаковые тексты — отличается только визуальный язык.
+          Посмотрите все три и скажите, какой ваш. Выбранный доводим до конца, два других удаляем.
+        </p>
+      </div>
+
+      <div class="grid">
+        {variants.map((v) => (
+          <a class="card" href={asset(`/${v.id}/`)}>
+            <div class="card-top">
+              <span class="letter">{v.label}</span>
+              <div class="swatches">
+                {v.swatches.map((c) => <span style={`background:${c}`}></span>)}
+              </div>
+            </div>
+            <h2>{v.name}</h2>
+            <div class="idea">{v.idea}</div>
+            <p>{v.text}</p>
+            <span class="go">Смотреть вариант {v.label} →</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="note">
+        <h3>Что здесь ещё не настоящее</h3>
+        <p>
+          Всё, что помечено <b>⚠️</b> прямо на странице, — заглушка, а не решение:
+          формат и даты курса, цены во всех тарифах, трое приглашённых экспертов
+          (имена, регалии, фото). Название «Алхимия красоты» — рабочее.
+          Тексты программы — черновик под правку.
+        </p>
+        <p>
+          Программа сейчас — {s.blocks.length} блоков: {s.blocks.map((b) => b.data.title).join(' · ')}.
+        </p>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style is:global>
+  :root { --paper: #fbfaf7; --ink: #15161a; --ink-soft: #6b6c72; --line: rgba(21, 22, 26, 0.14); --clay: #a8442f; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif; background: var(--paper); color: var(--ink);
+    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .pick { padding: 84px 0 100px; }
+
+  .head { max-width: 720px; margin-bottom: 56px; }
+  .mark {
+    display: inline-block; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--clay); border: 1px solid var(--clay); padding: 5px 12px; margin-bottom: 24px;
+  }
+  h1 { font-size: clamp(34px, 5vw, 56px); font-weight: 500; letter-spacing: -0.035em; line-height: 1.05; }
+  .lede { color: var(--ink-soft); font-size: 18px; margin-top: 20px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card {
+    border: 1px solid var(--line); background: #fff; padding: 26px 26px 28px;
+    display: flex; flex-direction: column; transition: 0.22s;
+  }
+  .card:hover { border-color: var(--ink); transform: translateY(-3px); box-shadow: 0 22px 40px -28px rgba(21, 22, 26, 0.6); }
+  .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .letter { font-size: 30px; font-weight: 500; letter-spacing: -0.04em; }
+  .swatches { display: flex; gap: 5px; }
+  .swatches span { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--line); }
+  .card h2 { font-size: 25px; font-weight: 500; letter-spacing: -0.03em; }
+  .idea { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin: 8px 0 14px; }
+  .card p { color: var(--ink-soft); font-size: 15px; flex: 1; }
+  .go { margin-top: 22px; font-size: 14px; font-weight: 500; }
+  .card:hover .go { color: var(--clay); }
+
+  .note { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 28px; max-width: 760px; }
+  .note h3 { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .note p { color: var(--ink-soft); font-size: 15.5px; }
+  .note p + p { margin-top: 12px; }
+  .note b { color: var(--clay); }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .pick { padding: 56px 0 72px; }
+  }
+</style>

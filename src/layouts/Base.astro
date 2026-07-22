@@ -1,0 +1,55 @@
+---
+import { asset } from '../lib/asset';
+
+interface Props {
+  title: string;
+  description?: string;
+  fonts?: string; // href на Google Fonts — у каждого направления свой набор
+}
+const { title, description, fonts } = Astro.props;
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <!-- Черновик на согласовании — из поиска прячем -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href={asset('/favicon.svg')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {fonts && <link href={fonts} rel="stylesheet" />}
+    <!-- Без JS секции с [data-animate] остались бы навсегда прозрачными -->
+    <noscript>
+      <style>[data-animate] { opacity: 1 !important; transform: none !important; }</style>
+    </noscript>
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      // Плавное появление секций
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { rootMargin: '0px 0px -8% 0px' }
+      );
+      document.querySelectorAll('[data-animate]').forEach((el) => io.observe(el));
+
+      // Шапка на скролле
+      const hdr = document.querySelector('[data-header]');
+      if (hdr) {
+        const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 20);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }
+    </script>
+  </body>
+</html>
