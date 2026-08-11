@@ -22,6 +22,8 @@ const push = process.argv.includes('--push');
 // ссылками с GitHub Pages хаба (чтобы не таскать бинарники в каждый деплой).
 const vercel = process.argv.includes('--vercel');
 const ASSET_HOST = 'https://razovik-hub.github.io/krasota';
+// Формы заявок на всех сайтах шлют в одну Vercel-функцию (проект krasota-api)
+const LEAD_API = 'https://krasota-api.vercel.app/api/lead';
 const run = (cmd, args, env) =>
   execFileSync(cmd, args, { stdio: 'inherit', env: { ...process.env, ...env } });
 
@@ -36,7 +38,11 @@ try {
       INDEX,
       `---\nimport Variant from '../variants/${v.component}.astro';\n---\n<Variant />\n`
     );
-    run('npx', ['astro', 'build'], { DEPLOY: 'ghpages', BASE_NAME: `krasota-${v.id}` });
+    run('npx', ['astro', 'build'], {
+      DEPLOY: 'ghpages',
+      BASE_NAME: `krasota-${v.id}`,
+      PUBLIC_LEAD_API: LEAD_API,
+    });
 
     const out = `out/${v.id}`;
     rmSync(out, { recursive: true, force: true });
@@ -50,7 +56,7 @@ try {
     writeFileSync(`${out}/.nojekyll`, '');
 
     if (vercel) {
-      run('npx', ['astro', 'build'], { ASSET_HOST });
+      run('npx', ['astro', 'build'], { ASSET_HOST, PUBLIC_LEAD_API: LEAD_API });
       const vout = `out/vercel-${v.id}`;
       rmSync(vout, { recursive: true, force: true });
       mkdirSync(vout, { recursive: true });
