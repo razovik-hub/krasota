@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { asset, isTodo } from '../lib/asset';
+import LeadForm from '../components/LeadForm.astro';
 import { loadSite } from '../lib/content';
 
 const s = await loadSite();
@@ -73,32 +74,64 @@ const FONTS =
     </div>
   </section>
 
-  <!-- ПРОГРАММА -->
+  <!-- ПРОГРАММА: 3 части → лекции по 30 минут -->
   <section id="program">
     <div class="wrap">
       <div class="sec-head" data-animate>
         <div>
-          <div class="mono">{s.blocksIntro.eyebrow}</div>
-          <h2>{s.blocksIntro.title}</h2>
+          <div class="mono">{s.partsIntro.eyebrow}</div>
+          <h2>{s.partsIntro.title}</h2>
         </div>
-        <p class="lede">{s.blocksIntro.subtitle}</p>
+        <p class="lede">{s.partsIntro.subtitle}</p>
       </div>
-      <div class="rows">
-        {s.blocks.map((b) => (
-          <div class="row" data-animate>
-            <div class="idx">{String(b.data.order).padStart(2, '0')}</div>
+      {s.parts.map((p) => (
+        <div class="part" data-animate>
+          <div class="part-head">
             <div>
-              <h3>{b.data.title}</h3>
-              {b.data.tag && <span class="tag">{b.data.tag}</span>}
+              <div class="mono">{p.data.tag} · {p.data.lectures.length} лекций</div>
+              <h3 class="part-title">{String(p.data.order).padStart(2, '0')} — {p.data.title}</h3>
+              {p.data.draft && <div class="mono todo">⚠️ структура лекций на утверждении у Марины</div>}
             </div>
-            <div class="row-body">
-              <b.Body />
-              {b.data.outcome && (
-                <div class="outcome"><span class="mono">На выходе</span>{b.data.outcome}</div>
-              )}
-            </div>
+            <div class="part-about"><p.Body /></div>
           </div>
-        ))}
+          <div class="lects">
+            {p.data.lectures.map((l, i) => (
+              <div class="lect">
+                <div class="lect-num mono">{p.data.order}.{i + 1}<span class="lect-min">30 мин</span></div>
+                <div>
+                  <div class="lect-title">
+                    {l.title}
+                    {l.guest && <span class="lect-guest mono">Приглашённый спикер</span>}
+                  </div>
+                  {l.about && <p class="lect-about">{l.about}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- МАТЕРИАЛЫ И БОНУСЫ -->
+  <section id="extras">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <div>
+          <div class="mono">{s.extras.eyebrow}</div>
+          <h2>{s.extras.title}</h2>
+        </div>
+        <p class="lede">{s.extras.subtitle}</p>
+      </div>
+      <div class="xt-grid" data-animate>
+        <div class="xt">
+          <div class="mono">Материалы</div>
+          <ul>{s.extras.materials?.map((m) => <li class={isTodo(m) ? 'todo' : ''}>{m}</li>)}</ul>
+        </div>
+        <div class="xt">
+          <div class="mono">Бонусы</div>
+          <ul>{s.extras.bonuses?.map((b) => <li class={isTodo(b) ? 'todo' : ''}>{b}</li>)}</ul>
+        </div>
       </div>
     </div>
   </section>
@@ -201,7 +234,7 @@ const FONTS =
       <div class="mono">Набор открыт</div>
       <h2>{s.cta.title}</h2>
       <p>{s.cta.subtitle}</p>
-      <a class="btn btn-lg" href="#cta">{s.cta.button}</a>
+      <LeadForm source="A · Клиника" />
       {s.cta.note && <div class="note mono">{s.cta.note}</div>}
     </div>
   </section>
@@ -320,27 +353,34 @@ const FONTS =
   }
   .md-list strong { color: var(--ink); font-weight: 500; }
 
-  /* ПРОГРАММА */
-  .rows { border-top: 1px solid var(--line); }
-  .row {
-    display: grid; grid-template-columns: 64px 1fr 1.25fr; gap: 32px;
-    padding: 28px 0; border-bottom: 1px solid var(--line-2); align-items: start; transition: background 0.2s;
+  /* ПРОГРАММА: часть → лекции */
+  .part { border-top: 1px solid var(--line); padding: 44px 0 20px; }
+  .part-head { display: grid; grid-template-columns: 1fr 1.25fr; gap: 32px; margin-bottom: 28px; align-items: start; }
+  .part-title { font-size: 34px; letter-spacing: -0.035em; margin-top: 12px; }
+  .part-head .todo { margin-top: 10px; }
+  .part-about { color: var(--ink-soft); font-size: 15.5px; }
+  .lects { border-top: 1px solid var(--line-2); }
+  .lect {
+    display: grid; grid-template-columns: 96px 1fr; gap: 24px;
+    padding: 18px 0; border-bottom: 1px solid var(--line-2); align-items: baseline; transition: background 0.2s;
   }
-  .row:hover { background: var(--paper-2); }
-  .row .idx { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--clay); padding-top: 5px; }
-  .row h3 { font-size: 23px; letter-spacing: -0.03em; }
-  .row .tag {
-    display: block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
-    letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px;
+  .lect:hover { background: var(--paper-2); }
+  .lect-num { color: var(--clay); }
+  .lect-min { display: block; color: var(--ink-soft); margin-top: 3px; }
+  .lect-title { font-weight: 500; font-size: 17px; letter-spacing: -0.02em; }
+  .lect-guest { margin-left: 10px; color: var(--clay); border: 1px solid var(--line); padding: 3px 8px; }
+  .lect-about { color: var(--ink-soft); font-size: 14.5px; margin-top: 4px; }
+
+  /* МАТЕРИАЛЫ И БОНУСЫ */
+  .xt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--line); }
+  .xt { padding: 28px 26px 30px; border-left: 1px solid var(--line); }
+  .xt:first-child { border-left: 0; padding-left: 0; }
+  .xt ul { list-style: none; margin-top: 16px; }
+  .xt li {
+    padding: 12px 0 12px 26px; border-bottom: 1px solid var(--line-2);
+    position: relative; color: var(--ink-soft); font-size: 15.5px;
   }
-  .row-body { color: var(--ink-soft); font-size: 15.5px; }
-  .row-body p + p { margin-top: 12px; }
-  .outcome {
-    margin-top: 16px; padding: 14px 16px; background: var(--paper-2);
-    border: 1px solid var(--line-2); border-left: 2px solid var(--clay);
-    color: var(--ink); font-size: 15px;
-  }
-  .outcome .mono { display: block; margin-bottom: 5px; color: var(--clay); }
+  .xt li::before { content: ''; position: absolute; left: 0; top: 22px; width: 14px; height: 1px; background: var(--clay); }
 
   /* ЭКСПЕРТЫ */
   .ex-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; border-top: 1px solid var(--line); }
@@ -397,7 +437,7 @@ const FONTS =
   .tf .btn { width: 100%; }
 
   /* CTA */
-  .cta { background: var(--ink); color: #fff; border: 0; }
+  .cta { background: var(--ink); color: #fff; border: 0; --lf-r: 0; --lf-btn-bg: var(--clay); --lf-btn-color: #fff; }
   .cta h2 { font-size: clamp(32px, 4.4vw, 54px); max-width: 20ch; margin: 20px 0 0; }
   .cta p { color: rgba(255, 255, 255, 0.62); margin: 20px 0 34px; max-width: 48ch; font-size: 17px; }
   .cta .mono { color: rgba(255, 255, 255, 0.45); }
@@ -412,8 +452,10 @@ const FONTS =
     .spec-grid { grid-template-columns: 1fr 1fr; }
     .spec-cell { border-left: 0; padding-left: 0; border-top: 1px solid var(--line-2); }
     .md-list ul { grid-template-columns: 1fr; }
-    .row { grid-template-columns: 40px 1fr; gap: 16px; }
-    .row-body { grid-column: 2; }
+    .part-head { grid-template-columns: 1fr; gap: 16px; }
+    .lect { grid-template-columns: 56px 1fr; gap: 14px; }
+    .xt-grid { grid-template-columns: 1fr; }
+    .xt { border-left: 0; padding: 24px 0; }
     .ex-grid, .tf-grid { grid-template-columns: 1fr 1fr; }
     .ex, .tf { border-left: 0; padding: 24px 0; }
     .nav { display: none; }

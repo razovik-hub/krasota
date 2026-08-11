@@ -2,14 +2,22 @@ import { defineCollection, z } from 'astro:content';
 
 // Схема описана человеческим языком в CONTENT-SCHEMA.md — держать файлы синхронно.
 
-// Блоки программы — каждый отдельным .md
-const blocks = defineCollection({
+// Части программы (кожа / волосы / ногти) — методология Марины:
+// внутри каждой части лекции по 30 минут, 5–7 штук.
+const parts = defineCollection({
   type: 'content',
   schema: z.object({
     order: z.number(),
     title: z.string(),
-    tag: z.string().optional(),      // короткая подпись под заголовком
-    outcome: z.string().optional(),  // что участница получает на выходе
+    tag: z.string().optional(),        // «Часть первая»
+    draft: z.boolean().default(false), // true = структура лекций ещё не утверждена Мариной
+    lectures: z.array(
+      z.object({
+        title: z.string(),
+        about: z.string().optional(),
+        guest: z.boolean().default(false), // лекцию ведёт приглашённый спикер
+      })
+    ),
   }),
 });
 
@@ -60,6 +68,8 @@ const page = defineCollection({
     photo: z.string().optional(),
     photoAlt: z.string().optional(),
     siteTitle: z.string().optional(),
+    materials: z.array(z.string()).optional(),
+    bonuses: z.array(z.string()).optional(),
     trust: z.array(z.string()).optional(),
     stats: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
     items: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
@@ -67,4 +77,4 @@ const page = defineCollection({
   }),
 });
 
-export const collections = { blocks, experts, tariffs, page };
+export const collections = { parts, experts, tariffs, page };

@@ -1,13 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import { asset, isTodo } from '../lib/asset';
+import LeadForm from '../components/LeadForm.astro';
 import { loadSite } from '../lib/content';
 
 const s = await loadSite();
 const h = s.hero;
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500;600&display=swap';
-const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 эксперта', 'Только практика'];
+const marquee = ['Кожа', 'Волосы', 'Ногти', '3 части', '15 лекций по 30 минут', 'Только практика'];
 ---
 
 <Base title={h.siteTitle!} description={h.subtitle} fonts={FONTS}>
@@ -80,28 +81,61 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
     </div>
   </section>
 
-  <!-- ПРОГРАММА -->
+  <!-- ПРОГРАММА: 3 части → лекции по 30 минут -->
   <section id="program">
     <div class="wrap">
       <div class="sec-head" data-animate>
-        <span class="kicker accent">{s.blocksIntro.eyebrow}</span>
-        <h2>{s.blocksIntro.title}</h2>
-        <p>{s.blocksIntro.subtitle}</p>
+        <span class="kicker accent">{s.partsIntro.eyebrow}</span>
+        <h2>{s.partsIntro.title}</h2>
+        <p>{s.partsIntro.subtitle}</p>
       </div>
       <div class="prog">
-        {s.blocks.map((b) => (
+        {s.parts.map((p) => (
           <div class="p-row" data-animate>
-            <div class="n">{String(b.data.order).padStart(2, '0')}</div>
+            <div class="p-side">
+              <div class="n">{String(p.data.order).padStart(2, '0')}</div>
+              <span class="tag">{p.data.tag} · {p.data.lectures.length} лекций</span>
+            </div>
             <div>
-              {b.data.tag && <span class="tag">{b.data.tag}</span>}
-              <h3>{b.data.title}</h3>
-              <div class="p-body"><b.Body /></div>
-              {b.data.outcome && (
-                <div class="outcome"><span class="kicker">На выходе</span>{b.data.outcome}</div>
-              )}
+              <h3>{p.data.title}</h3>
+              {p.data.draft && <div class="tag todo" style="margin-top:10px">⚠️ структура на утверждении у Марины</div>}
+              <div class="p-body"><p.Body /></div>
+              <ol class="lects">
+                {p.data.lectures.map((l) => (
+                  <li>
+                    <div class="lect-title">
+                      {l.title}
+                      <span class="lect-min kicker">30 мин</span>
+                      {l.guest && <span class="lect-guest kicker">Приглашённый спикер</span>}
+                    </div>
+                    {l.about && <p class="lect-about">{l.about}</p>}
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- МАТЕРИАЛЫ И БОНУСЫ -->
+  <section id="extras">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <span class="kicker accent">{s.extras.eyebrow}</span>
+        <h2>{s.extras.title}</h2>
+        <p>{s.extras.subtitle}</p>
+      </div>
+      <div class="xt-grid" data-animate>
+        <div class="xt">
+          <div class="kicker accent">Материалы</div>
+          <ul>{s.extras.materials?.map((m) => <li class={isTodo(m) ? 'todo' : ''}>{m}</li>)}</ul>
+        </div>
+        <div class="xt">
+          <div class="kicker accent">Бонусы</div>
+          <ul>{s.extras.bonuses?.map((b) => <li class={isTodo(b) ? 'todo' : ''}>{b}</li>)}</ul>
+        </div>
       </div>
     </div>
   </section>
@@ -197,7 +231,7 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
       <span class="kicker">Набор открыт</span>
       <h2>{s.cta.title}</h2>
       <p>{s.cta.subtitle}</p>
-      <a class="btn" href="#cta">{s.cta.button}</a>
+      <LeadForm source="B · Глянец" />
       {s.cta.note && <div class="note kicker">{s.cta.note}</div>}
     </div>
   </section>
@@ -312,10 +346,22 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
     display: inline-block; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
     color: var(--ink-soft); border: 1px solid var(--line); padding: 5px 13px; margin-bottom: 16px;
   }
-  .p-body { color: var(--ink-soft); font-weight: 300; font-size: 17px; max-width: 64ch; }
+  .p-body { color: var(--ink-soft); font-weight: 300; font-size: 17px; max-width: 64ch; margin-top: 14px; }
   .p-body p + p { margin-top: 14px; }
-  .outcome { margin-top: 20px; padding: 16px 20px; border-left: 2px solid var(--lip); background: rgba(176, 31, 60, 0.045); font-size: 16px; max-width: 64ch; }
-  .outcome .kicker { display: block; color: var(--lip); margin-bottom: 6px; }
+  .p-side .tag { display: inline-block; margin-top: 16px; }
+  .lects { list-style: none; margin-top: 26px; border-top: 1px solid var(--line); max-width: 70ch; }
+  .lects li { padding: 16px 0; border-bottom: 1px solid var(--line-2); }
+  .lect-title { font-size: 18px; }
+  .lect-min { color: var(--ink-soft); margin-left: 12px; font-size: 10px; }
+  .lect-guest { color: var(--lip); margin-left: 10px; font-size: 10px; border: 1px solid var(--line); padding: 3px 9px; }
+  .lect-about { color: var(--ink-soft); font-weight: 300; font-size: 15px; margin-top: 5px; }
+
+  /* МАТЕРИАЛЫ И БОНУСЫ */
+  .xt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; max-width: 980px; margin: 0 auto; }
+  .xt { border: 1px solid var(--line); padding: 30px 30px 32px; }
+  .xt ul { list-style: none; margin-top: 18px; }
+  .xt li { padding: 12px 0 12px 30px; border-bottom: 1px solid var(--line-2); position: relative; color: var(--ink-soft); font-weight: 300; font-size: 15.5px; }
+  .xt li::before { content: '✦'; position: absolute; left: 4px; top: 12px; color: var(--lip); font-size: 11px; }
 
   /* ЭКСПЕРТЫ */
   .ex-wrap { background: var(--blush); }
@@ -359,7 +405,7 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
   .tf .btn { width: 100%; }
 
   /* CTA */
-  .cta { text-align: center; background: var(--ink); color: var(--paper); }
+  .cta { text-align: center; background: var(--ink); color: var(--paper); --lf-r: 0; --lf-btn-bg: var(--lip); --lf-btn-color: #fff; }
   .cta h2 { font-size: clamp(38px, 5.8vw, 78px); max-width: 18ch; margin: 24px auto 0; }
   .cta p { color: rgba(246, 243, 239, 0.6); font-weight: 300; margin: 26px auto 38px; max-width: 46ch; font-size: 18px; }
   .cta .kicker { color: rgba(246, 243, 239, 0.5); }
@@ -376,6 +422,7 @@ const marquee = ['Кожа', 'Волосы', 'Ногти', '7 блоков', '4 
     .nums-grid { grid-template-columns: 1fr 1fr; gap: 40px 20px; }
     .p-row { grid-template-columns: 1fr; gap: 12px; }
     .p-row .n { font-size: 52px; }
+    .xt-grid { grid-template-columns: 1fr; }
     .ex-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
     .tf-grid,
     .tf-grid.tf-2, .tf-grid.tf-1 { grid-template-columns: 1fr; max-width: none; }

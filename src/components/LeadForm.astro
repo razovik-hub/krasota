@@ -1,0 +1,82 @@
+---
+// Форма заявки. Одна на все варианты — внешний вид подстраивается CSS-переменными,
+// которые каждый вариант задаёт в своём блоке CTA (--lf-r, --lf-btn-bg, --lf-btn-color).
+// Куда шлём: PUBLIC_LEAD_API (абсолютный URL функции на Vercel) или /api/lead,
+// если сайт сам живёт на Vercel рядом с функцией.
+interface Props { source: string }
+const { source } = Astro.props;
+const api = import.meta.env.PUBLIC_LEAD_API || '/api/lead';
+---
+<form class="lf" data-api={api} data-source={source}>
+  <div class="lf-fields">
+    <input class="lf-in" name="name" type="text" placeholder="Как вас зовут" autocomplete="name" />
+    <input class="lf-in" name="contact" type="text" placeholder="Телефон или @телеграм" autocomplete="tel" required />
+    <button class="lf-btn" type="submit">Оставить заявку</button>
+  </div>
+  <div class="lf-note">Никакой рассылки — только ответ по курсу.</div>
+  <div class="lf-done" hidden>Заявка ушла. Свяжемся в ближайшее время — спасибо!</div>
+  <div class="lf-fail" hidden>Не получилось отправить. Напишите нам напрямую — или попробуйте ещё раз.</div>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form.lf').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector<HTMLButtonElement>('.lf-btn')!;
+      const done = form.querySelector<HTMLElement>('.lf-done')!;
+      const fail = form.querySelector<HTMLElement>('.lf-fail')!;
+      fail.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Отправляю…';
+      try {
+        const data = new FormData(form);
+        const r = await fetch(form.dataset.api!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.get('name'),
+            contact: data.get('contact'),
+            source: form.dataset.source,
+          }),
+        });
+        if (!r.ok) throw new Error(String(r.status));
+        form.querySelector<HTMLElement>('.lf-fields')!.hidden = true;
+        form.querySelector<HTMLElement>('.lf-note')!.hidden = true;
+        done.hidden = false;
+      } catch {
+        fail.hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Оставить заявку';
+      }
+    });
+  });
+</script>
+
+<style is:global>
+  .lf { max-width: 640px; margin: 34px auto 0; }
+  .lf-fields { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .lf-in {
+    flex: 1 1 220px; min-width: 0;
+    font: inherit; font-size: 15px;
+    padding: 15px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--lf-r, 0);
+    background: rgba(255, 255, 255, 0.96);
+    color: #1a1a1e;
+  }
+  .lf-in:focus { outline: 2px solid rgba(255, 255, 255, 0.65); outline-offset: 1px; }
+  .lf-btn {
+    flex: 0 0 auto;
+    font: inherit; font-size: 15px; font-weight: 600;
+    padding: 15px 28px; cursor: pointer;
+    border: 1px solid var(--lf-btn-bg, #1a1a1e);
+    border-radius: var(--lf-r, 0);
+    background: var(--lf-btn-bg, #1a1a1e);
+    color: var(--lf-btn-color, #fff);
+    transition: 0.2s;
+  }
+  .lf-btn:hover { filter: brightness(1.12); }
+  .lf-btn:disabled { opacity: 0.6; cursor: default; }
+  .lf-note { margin-top: 12px; font-size: 13px; opacity: 0.65; text-align: center; }
+  .lf-done, .lf-fail { margin-top: 16px; font-size: 16px; text-align: center; }
+</style>

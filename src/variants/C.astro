@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { asset, isTodo } from '../lib/asset';
+import LeadForm from '../components/LeadForm.astro';
 import { loadSite } from '../lib/content';
 
 const s = await loadSite();
@@ -73,26 +74,63 @@ const FONTS =
     </div>
   </section>
 
-  <!-- ПРОГРАММА -->
+  <!-- ПРОГРАММА: 3 части → лекции по 30 минут -->
   <section id="program">
     <div class="wrap">
       <div class="sec-head" data-animate>
-        <span class="eyebrow">{s.blocksIntro.eyebrow}</span>
-        <h2>{s.blocksIntro.title}</h2>
-        <p>{s.blocksIntro.subtitle}</p>
+        <span class="eyebrow">{s.partsIntro.eyebrow}</span>
+        <h2>{s.partsIntro.title}</h2>
+        <p>{s.partsIntro.subtitle}</p>
       </div>
-      <div class="cards">
-        {s.blocks.map((b) => (
-          <div class="card" data-animate>
-            <div class="n">{String(b.data.order).padStart(2, '0')}</div>
-            {b.data.tag && <span class="tag">{b.data.tag}</span>}
-            <h3>{b.data.title}</h3>
-            <div class="card-body"><b.Body /></div>
-            {b.data.outcome && (
-              <div class="outcome"><span class="lbl">На выходе</span>{b.data.outcome}</div>
-            )}
+      <div class="parts">
+        {s.parts.map((p) => (
+          <div class="part card" data-animate>
+            <div class="part-top">
+              <div class="n">{String(p.data.order).padStart(2, '0')}</div>
+              <div>
+                <span class="tag">{p.data.tag} · {p.data.lectures.length} лекций по 30 минут</span>
+                <h3>{p.data.title}</h3>
+              </div>
+            </div>
+            {p.data.draft && <div class="tag todo">⚠️ структура на утверждении у Марины</div>}
+            <div class="card-body"><p.Body /></div>
+            <ul class="lects">
+              {p.data.lectures.map((l, i) => (
+                <li>
+                  <span class="lect-i">{i + 1}</span>
+                  <div>
+                    <div class="lect-title">
+                      {l.title}
+                      {l.guest && <span class="lect-guest">приглашённый спикер</span>}
+                    </div>
+                    {l.about && <p class="lect-about">{l.about}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- МАТЕРИАЛЫ И БОНУСЫ -->
+  <section id="extras">
+    <div class="wrap">
+      <div class="sec-head" data-animate>
+        <span class="eyebrow">{s.extras.eyebrow}</span>
+        <h2>{s.extras.title}</h2>
+        <p>{s.extras.subtitle}</p>
+      </div>
+      <div class="xt-grid" data-animate>
+        <div class="xt card">
+          <span class="lbl">Материалы</span>
+          <ul>{s.extras.materials?.map((m) => <li class={isTodo(m) ? 'todo' : ''}>{m}</li>)}</ul>
+        </div>
+        <div class="xt card">
+          <span class="lbl">Бонусы</span>
+          <ul>{s.extras.bonuses?.map((b) => <li class={isTodo(b) ? 'todo' : ''}>{b}</li>)}</ul>
+        </div>
       </div>
     </div>
   </section>
@@ -189,7 +227,7 @@ const FONTS =
         <span class="eyebrow light">Набор открыт</span>
         <h2>{s.cta.title}</h2>
         <p>{s.cta.subtitle}</p>
-        <a class="btn btn-lg btn-light" href="#cta">{s.cta.button}</a>
+        <LeadForm source="C · Тактильный нюд" />
         {s.cta.note && <div class="note">{s.cta.note}</div>}
       </div>
     </div>
@@ -319,22 +357,38 @@ const FONTS =
   }
   .md-list strong { color: var(--ink); font-weight: 700; }
 
-  /* ПРОГРАММА */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-  .card { background: var(--card); border-radius: var(--r); padding: 32px 30px 34px; box-shadow: var(--sh-sm); transition: 0.28s; display: flex; flex-direction: column; }
-  .card:hover { transform: translateY(-5px); box-shadow: var(--sh); }
-  .card .n {
-    font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; color: #fff8f3;
-    background: var(--caramel); width: 38px; height: 38px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  /* ПРОГРАММА: часть → лекции */
+  .parts { display: grid; gap: 26px; max-width: 880px; margin: 0 auto; }
+  .card { background: var(--card); border-radius: var(--r); padding: 34px 34px 30px; box-shadow: var(--sh-sm); }
+  .part-top { display: flex; gap: 18px; align-items: center; margin-bottom: 14px; }
+  .part .n {
+    font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: #fff8f3;
+    background: var(--caramel); width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .card:nth-child(1) .n, .card:nth-child(2) .n { background: var(--sage); }
-  .card .tag { font-size: 12px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--clay); margin-bottom: 10px; display: block; }
-  .card h3 { font-size: 26px; margin-bottom: 12px; }
-  .card-body { color: var(--ink-soft); font-size: 15.5px; flex: 1; }
-  .card-body p + p { margin-top: 12px; }
-  .outcome { margin-top: 18px; background: var(--skin); border-radius: 18px; padding: 14px 18px; font-size: 15px; }
-  .outcome .lbl { display: block; margin-bottom: 5px; }
+  .part .tag { font-size: 12px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--clay); display: block; margin-bottom: 4px; }
+  .part h3 { font-size: 30px; }
+  .card-body { color: var(--ink-soft); font-size: 15.5px; }
+  .lects { list-style: none; margin-top: 20px; }
+  .lects li { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .lect-i {
+    font-family: 'Fraunces', serif; font-size: 13px; font-weight: 600; color: var(--caramel);
+    background: var(--skin); width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .lect-title { font-weight: 700; font-size: 16px; }
+  .lect-guest {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--sage); background: rgba(126, 138, 107, 0.14); border-radius: 999px;
+    padding: 3px 10px; margin-left: 10px; white-space: nowrap;
+  }
+  .lect-about { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }
+
+  /* МАТЕРИАЛЫ И БОНУСЫ */
+  .xt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 880px; margin: 0 auto; }
+  .xt ul { list-style: none; margin-top: 16px; }
+  .xt li { padding: 11px 0 11px 26px; border-top: 1px solid var(--line); position: relative; color: var(--ink-soft); font-size: 15px; }
+  .xt li::before { content: '✦'; position: absolute; left: 2px; top: 11px; color: var(--clay); font-size: 12px; }
 
   /* ЭКСПЕРТЫ */
   .ex-band { background: var(--skin-2); border-radius: 48px; max-width: 1320px; margin: 0 auto; }
@@ -389,7 +443,9 @@ const FONTS =
   .cta-in {
     background: var(--caramel); color: #fff8f3; border-radius: 48px; padding: 76px 40px;
     text-align: center; position: relative; overflow: hidden; box-shadow: var(--sh);
+    --lf-r: 999px; --lf-btn-bg: var(--ink); --lf-btn-color: #fff8f3;
   }
+  .cta-in .lf { position: relative; }
   .cta-in::before { content: ''; position: absolute; left: -90px; bottom: -140px; width: 420px; height: 420px; border-radius: 50%; background: rgba(255, 248, 243, 0.09); }
   .cta-in::after { content: ''; position: absolute; right: -70px; top: -150px; width: 340px; height: 340px; border-radius: 50%; background: rgba(255, 248, 243, 0.07); }
   .cta-in h2 { font-size: clamp(32px, 4.6vw, 56px); max-width: 18ch; margin: 20px auto 0; position: relative; }
@@ -403,7 +459,8 @@ const FONTS =
     .hero-grid { grid-template-columns: 1fr; gap: 44px; }
     .float.f1 { left: 10px; }
     .float.f2 { right: 6px; }
-    .cards, .tf-grid { grid-template-columns: 1fr 1fr; }
+    .tf-grid { grid-template-columns: 1fr 1fr; }
+    .xt-grid { grid-template-columns: 1fr; }
     .ex-grid { grid-template-columns: 1fr 1fr; }
     .nav { display: none; }
   }
@@ -411,7 +468,7 @@ const FONTS =
     .wrap { padding: 0 20px; }
     section { padding: 64px 0; }
     .nums-grid { grid-template-columns: 1fr 1fr; }
-    .md-list ul, .cards, .tf-grid, .ex-grid,
+    .md-list ul, .tf-grid, .ex-grid, .xt-grid,
     .tf-grid.tf-2, .tf-grid.tf-1 { grid-template-columns: 1fr; max-width: none; }
     .ex-band { border-radius: 32px; }
     .cta-in { border-radius: 32px; padding: 54px 24px; }

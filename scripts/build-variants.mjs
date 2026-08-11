@@ -18,6 +18,10 @@ const VARIANTS = [
 
 const INDEX = 'src/pages/index.astro';
 const push = process.argv.includes('--push');
+// --vercel: дополнительно собрать версии для Vercel — base=/, фото абсолютными
+// ссылками с GitHub Pages хаба (чтобы не таскать бинарники в каждый деплой).
+const vercel = process.argv.includes('--vercel');
+const ASSET_HOST = 'https://razovik-hub.github.io/krasota';
 const run = (cmd, args, env) =>
   execFileSync(cmd, args, { stdio: 'inherit', env: { ...process.env, ...env } });
 
@@ -44,6 +48,17 @@ try {
 
     // Без .nojekyll GitHub Pages выбросит каталог _astro — он начинается с подчёркивания
     writeFileSync(`${out}/.nojekyll`, '');
+
+    if (vercel) {
+      run('npx', ['astro', 'build'], { ASSET_HOST });
+      const vout = `out/vercel-${v.id}`;
+      rmSync(vout, { recursive: true, force: true });
+      mkdirSync(vout, { recursive: true });
+      cpSync('dist', vout, { recursive: true });
+      for (const dead of VARIANTS) rmSync(`${vout}/${dead.id}`, { recursive: true, force: true });
+      // Фото уезжают на ASSET_HOST — локальные копии в деплой не нужны
+      for (const f of ['bayandina-author.jpg', 'bayandina-card.jpg']) rmSync(`${vout}/${f}`, { force: true });
+    }
   }
 } finally {
   writeFileSync(INDEX, hub);
